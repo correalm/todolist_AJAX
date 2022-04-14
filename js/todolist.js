@@ -1,41 +1,52 @@
 import {Task} from './Model/Task.model.js'
 import {creatXmlRequest} from './creatXML.js'
 import TasksService from './Services/tasks.service.js'
+import TasksController from './Controllers/Tasks.controller.js'
+import TasksView from './Views/Tasks.view.js'
 
 // const url = "https://jsonplaceholder.typicode.com/users/1/todos/"
 const urlUsers = "http://localhost:3000/users"
 const urlTasks = "http://localhost:3000/tasks"
 const userId = 1
 
+//ARMAZENAR O DOM EM VARIAVEIS
+const itemInput = document.getElementById("item-input")
+const todoAddForm = document.getElementById("todo-add")
+const ul = document.getElementById("todo-list")
+const lis = ul.getElementsByTagName("li")
+
 const taskService = new TasksService()
+const tasksView = new TasksView()
+const taskController = new TasksController(taskService, tasksView)
 
 
-
-// creatXmlRequest("GET", `${urlUsers}/${userId}/tasks`, init)
 taskService.getTasks(userId, init)
+
+// FORM
+todoAddForm.addEventListener("submit", function (e) {
+    e.preventDefault()
+    taskController.add(itemInput.value, userId)
+
+    itemInput.value = ""
+    itemInput.focus()
+});
+
 
 
 
 // when the data is ready, run the init function
 // cb will recived the return of GET
-function init(arrTasks){
+function init(arrInstancesTasks){
     // a partir de um array de objetos literais, crie um array contendo instancias de Tasks. 
     // Essa array deve chamar arrInstancesTasks
 
 
-    if(arrTasks.error) return
+    if(arrInstancesTasks.error) return
 
-    const arrInstancesTasks = arrTasks.map(task => {
-        const { title, completed, createdAt, updatedAt } = task
-        return new Task(title, completed, createdAt, updatedAt)
-    })
+    
 
 
-    //ARMAZENAR O DOM EM VARIAVEIS
-    const itemInput = document.getElementById("item-input")
-    const todoAddForm = document.getElementById("todo-add")
-    const ul = document.getElementById("todo-list")
-    const lis = ul.getElementsByTagName("li")
+    
 
 
     function generateLiTask(obj) {
@@ -163,15 +174,7 @@ function init(arrTasks){
         }
     }
 
-    todoAddForm.addEventListener("submit", function (e) {
-        e.preventDefault()
-        console.log(itemInput.value)
-        addTask(itemInput.value)
-
-        itemInput.value = ""
-        itemInput.focus()
-    });
-
+    
     ul.addEventListener("click", clickedUl)
 
     renderTasks()

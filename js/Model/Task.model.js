@@ -13,7 +13,7 @@ export function Task(title, completed, createdAt, updatedAt) {
         throw new Error("Task need a required parameter: title")
     }
     let _title = title
-    // this.title = title
+    this.title = title
     this.completed = completed || false
     this.createdAt = createdAt || Date.now()
     this.updatedAt = updatedAt || null

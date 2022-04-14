@@ -8,14 +8,28 @@ export default class TasksService{
         this.tasks = []
     }
 
-    add(task){
+    add(task, cb, userId){
         if(!task instanceof Task){
             throw TypeError("Task must be an instance of Task")
         }
-        this.tasks.push(task)
+
+        const fn = (task) => {
+            console.log(task)
+            this.tasks.push(new Task({title}))
+            if(typeof cb === "function") cb()
+        }
+        creatXmlRequest("POST", `${urlUsers}/${userId}/tasks`, fn, JSON.stringify(task))
+        
     }
 
     getTasks(userId, cb){
-        creatXmlRequest("GET", `${urlUsers}/${userId}/tasks`, cb)
+        const fn = (arrTasks) => {
+            this.tasks = arrTasks.map(task => {
+                const { title, completed, createdAt, updatedAt } = task
+                return new Task(title, completed, createdAt, updatedAt)
+            })
+            cb(this.tasks)
+        }
+        creatXmlRequest("GET", `${urlUsers}/${userId}/tasks`, fn)
     }
 }
