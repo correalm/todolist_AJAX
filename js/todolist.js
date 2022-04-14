@@ -1,13 +1,21 @@
 import {Task} from './Model/Task.model.js'
 import {creatXmlRequest} from './creatXML.js'
+import TasksService from './Services/tasks.service.js'
 
 // const url = "https://jsonplaceholder.typicode.com/users/1/todos/"
 const urlUsers = "http://localhost:3000/users"
 const urlTasks = "http://localhost:3000/tasks"
 const userId = 1
-const url = `${urlUsers}/${userId}/tasks`
 
-creatXmlRequest("GET", url, init)
+const taskService = new TasksService()
+
+
+
+// creatXmlRequest("GET", `${urlUsers}/${userId}/tasks`, init)
+taskService.getTasks(userId, init)
+
+
+
 // when the data is ready, run the init function
 // cb will recived the return of GET
 function init(arrTasks){
