@@ -13,10 +13,11 @@ export default class TasksService{
             throw TypeError("Task must be an instance of Task")
         }
 
-        const fn = (task) => {
-            console.log(task)
-            this.tasks.push(new Task({title}))
-            if(typeof cb === "function") cb()
+        const fn = (_task) => {
+            const {title, completed, createdAt, updatedAt} = _task
+            // this.tasks.push(new Task(title, completed, createdAt, updatedAt))
+            this.getTasks(userId, cb) // garante que os dados estão em conformidade com o servidor
+            // if(typeof cb === "function") cb()
         }
         creatXmlRequest("POST", `${urlUsers}/${userId}/tasks`, fn, JSON.stringify(task))
         
@@ -25,11 +26,18 @@ export default class TasksService{
     getTasks(userId, cb){
         const fn = (arrTasks) => {
             this.tasks = arrTasks.map(task => {
-                const { title, completed, createdAt, updatedAt } = task
-                return new Task(title, completed, createdAt, updatedAt)
+                const { title, completed, createdAt, updatedAt, id } = task
+                return new Task(title, completed, createdAt, updatedAt, id)
             })
             cb(this.tasks)
         }
         creatXmlRequest("GET", `${urlUsers}/${userId}/tasks`, fn)
+    }
+    remove(id, cb, userId){
+        const fn = () => {
+            this.getTasks(userId, cb) // garante que os dados estão em conformidade com o servidor
+            // if(typeof cb === "function") cb()
+        }
+        creatXmlRequest("DELETE", `http://localhost:3000/tasks/${id}`, fn)
     }
 }
