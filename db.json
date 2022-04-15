@@ -1,20 +1,13 @@
 {
   "tasks": [
     {
-      "title": "primeira tarefa editada com PUT",
+      "title": "mais uma tarefa editada com FETCH",
       "completed": false,
-      "createdAt": "",
-      "updatedAt": "",
-      "userId": 1,
-      "id": 1
-    },
-    {
-      "title": "terceira tarefa",
-      "completed": false,
-      "createdAt": 1649971413684,
-      "updatedAt": null,
+      "createdAt": 1650029884917,
+      "updatedAt": 1650034316241,
+      "id": 2,
       "userId": "1",
-      "id": 3
+      "upadateAt": 1650034316241
     }
   ],
   "users": [

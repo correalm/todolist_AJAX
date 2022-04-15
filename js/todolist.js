@@ -1,13 +1,7 @@
-import {Task} from './Model/Task.model.js'
-import {creatXmlRequest} from './creatXML.js'
 import TasksService from './Services/tasks.service.js'
 import TasksController from './Controllers/Tasks.controller.js'
 import TasksView from './Views/Tasks.view.js'
-
-// const url = "https://jsonplaceholder.typicode.com/users/1/todos/"
-const urlUsers = "http://localhost:3000/users"
-const urlTasks = "http://localhost:3000/tasks"
-const userId = 1
+ 
 
 //ARMAZENAR O DOM EM VARIAVEIS
 const itemInput = document.getElementById("item-input")
@@ -20,27 +14,18 @@ const tasksView = new TasksView(ul)
 const taskController = new TasksController(taskService, tasksView)
 
 
-taskService.getTasks(userId, init)
+taskController.getTasks()
 
 // FORM
 todoAddForm.addEventListener("submit", function (e) {
     e.preventDefault()
-    taskController.add(itemInput.value, userId)
+    taskController.add(itemInput.value)
 
     itemInput.value = ""
     itemInput.focus()
 });
 
-
-
-
-// when the data is ready, run the init function
-// cb will recived the return of GET
-
-function init(arrInstancesTasks){
-    if(arrInstancesTasks.error) return
-    tasksView.render(taskService.tasks)
-
+// clicked Ul
     function clickedUl(e) {
         const dataAction = e.target.getAttribute("data-action")
         console.log(e.target)
@@ -67,23 +52,25 @@ function init(arrInstancesTasks){
             deleteButton: function () {
                 // arrInstancesTasks.splice(currentLiIndex, 1)
                 // renderTasks()
-                taskController.remove(currentLi.getAttribute("data-id"), userId)
+                taskController.remove(currentLi.getAttribute("data-id"))
 
             },
             containerEditButton: function () {
-                const val = currentLi.querySelector(".editInput").value
-                arrInstancesTasks[currentLiIndex].setTitle(val)
-                renderTasks()
+                const title = currentLi.querySelector(".editInput").value
+                const id = currentLi.getAttribute("data-id")
+                taskController.edit({title, id})
             },
             containerCancelButton: function () {
+                const id = currentLi.getAttribute("data-id")
                 currentLi.querySelector(".editContainer").removeAttribute("style")
-                currentLi.querySelector(".editInput").value = arrInstancesTasks[currentLiIndex].getTitle()
+                currentLi.querySelector(".editInput").value = arrInstancesTasks[id].title()
             },
             checkButton: function () {
 
                 // DEVE USAR O MÉTODO toggleDone do objeto correto
-                arrInstancesTasks[currentLiIndex].toggleDone()
-                renderTasks()
+                const id = currentLi.getAttribute("data-id")
+                taskController.toogleDone(id)
+                
             }
         }
 
@@ -93,8 +80,6 @@ function init(arrInstancesTasks){
     }
     
     ul.addEventListener("click", clickedUl)
-
-}
 
 
 

@@ -1,4 +1,4 @@
-export function creatXmlRequest(method, url, cb, data = null){
+export function creatXmlRequest(method, url, sucess, error, data = null){
     // possui os métodos que permitem a comunicação com o servidor de forma síncrona
     const xhr = new XMLHttpRequest()
 
@@ -16,19 +16,15 @@ export function creatXmlRequest(method, url, cb, data = null){
         if(xhr.readyState === 4){ // retorna o estado 4(DONE), isto é, requisição foi feita com sucesso
             if(xhr.status < 400){
                 const json = JSON.parse(xhr.responseText)
-                if(typeof cb === "function"){
-                    cb(json)
+                if(typeof sucess === "function"){
+                    sucess(json)
                 }
             } 
-            else if (typeof cb === "function"){
-                cb({
-                    error: true,
-                    status: xhr.status,
-                    message: "Algo deu errado com a conexão"
-                })
+            else if (typeof error === "function"){
+                error("Algo deu errado com a conexão")
             }
          
-    }
+        }
 
     }
 }

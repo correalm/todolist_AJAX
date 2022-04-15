@@ -1,43 +1,54 @@
 import { Task } from './../Model/Task.model.js'
-import {creatXmlRequest} from './../creatXML.js'
-
-const urlUsers = "http://localhost:3000/users"
+import { creatFetch } from './../fetch.js'
+import { urlTasks, urlUsers } from '../config.js'
 
 export default class TasksService{
     constructor(){
         this.tasks = []
     }
 
-    add(task, cb, userId){
-        if(!task instanceof Task){
-            throw TypeError("Task must be an instance of Task")
-        }
-
-        const fn = (_task) => {
-            const {title, completed, createdAt, updatedAt} = _task
-            // this.tasks.push(new Task(title, completed, createdAt, updatedAt))
-            this.getTasks(userId, cb) // garante que os dados estão em conformidade com o servidor
-            // if(typeof cb === "function") cb()
-        }
-        creatXmlRequest("POST", `${urlUsers}/${userId}/tasks`, fn, JSON.stringify(task))
-        
+    add(task, cb, error, userId){
+        creatFetch("POST", `${urlUsers}/${userId}/tasks`, JSON.stringify(task))
+            .then(() => this.getTasks(userId))
+            .then(() => cb())
+            .catch(err => error(err))
     }
 
-    getTasks(userId, cb){
+    getTasks(userId, sucess, error){
+
+        
+
         const fn = (arrTasks) => {
             this.tasks = arrTasks.map(task => {
                 const { title, completed, createdAt, updatedAt, id } = task
                 return new Task(title, completed, createdAt, updatedAt, id)
             })
-            cb(this.tasks)
+            if(typeof sucess === "function") sucess(this.tasks)
+            return this.tasks
         }
-        creatXmlRequest("GET", `${urlUsers}/${userId}/tasks`, fn)
+        return creatFetch("GET", `${urlUsers}/${userId}/tasks`)
+            .then(response => {
+                return fn(response)
+            })
+            .catch(erro => error(erro.message))
     }
-    remove(id, cb, userId){
-        const fn = () => {
-            this.getTasks(userId, cb) // garante que os dados estão em conformidade com o servidor
-            // if(typeof cb === "function") cb()
-        }
-        creatXmlRequest("DELETE", `http://localhost:3000/tasks/${id}`, fn)
+
+    remove(id, cb, error, userId){
+        creatFetch("DELETE", `${urlTasks}/${id}`)
+            .then(() => this.getTasks(userId))
+            .then(() => cb())
+            .catch(erro => error(erro.message))
+    }
+
+    edit(task, sucess, error, userId){
+        task.updatedAt = Date.now()
+        creatFetch("PATCH", `${urlTasks}/${task.id}`, JSON.stringify(task))
+            .then(() => this.getTasks(userId))
+            .then(() => sucess())
+            .catch(erro => error(erro.message))
+    }
+
+    getById(id){
+        return this.tasks.find(task => parseInt(task.id) === id)
     }
 }
